@@ -1,88 +1,112 @@
-// src/context/CartContext.js
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(() => {
-    try {
-      const raw = localStorage.getItem("cart");
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      console.warn("Failed to read cart from localStorage", e);
-      return [];
-    }
-  });
+  const { user } = useAuth();
+  const [cartItems, setCartItems] = useState([]);
 
-  // Sync to localStorage
+  // ================= LOAD CART =================
   useEffect(() => {
-    try {
-      localStorage.setItem("cart", JSON.stringify(cartItems));
-    } catch (e) {
-      console.warn("Failed to write cart to localStorage", e);
+    const loadCart = async () => {
+      if (!user) {
+        const localCart = JSON.parse(localStorage.getItem("cart")) || [];
+        setCartItems(localCart);
+        return;
+      }
+
+      try {
+        const cartRef = doc(db, "users", user.uid, "cart", "data"); // ✅ correct path
+        const snap = await getDoc(cartRef);
+
+        if (snap.exists()) {
+          setCartItems(snap.data().items || []);
+        } else {
+          setCartItems([]);
+        }
+      } catch (err) {
+        console.error("Load cart failed:", err);
+      }
+    };
+
+    loadCart();
+  }, [user]);
+
+  // ================= SAVE CART =================
+  const saveCart = async (items) => {
+    if (!user) {
+      localStorage.setItem("cart", JSON.stringify(items));
+      return;
     }
-  }, [cartItems]);
 
-  // Add new product or update quantity if exists
-  const addToCart = (item) => {
-    const id = item._id ?? item.id;
-    const selectedSize = item.selectedSize ?? null;
-    const qtyToAdd = item.quantity ?? 1;
+    try {
+      await setDoc(doc(db, "users", user.uid, "cart", "data"), { items }); // ✅ correct path
+    } catch (err) {
+      console.error("Save cart failed:", err);
+    }
+  };
 
+  // ================= CART FUNCTIONS =================
+  const addToCart = (product) => {
     setCartItems((prev) => {
       const existing = prev.find(
-        (i) => i.id === id && (i.selectedSize ?? null) === selectedSize
+        (item) =>
+          item._id === product._id && item.selectedSize === product.selectedSize
       );
-      if (existing) {
-        return prev.map((i) =>
-          i.id === id && (i.selectedSize ?? null) === selectedSize
-            ? { ...i, quantity: (i.quantity ?? 1) + qtyToAdd }
-            : i
-        );
-      }
-      const normalized = { ...item, id, quantity: qtyToAdd };
-      delete normalized._id;
-      return [...prev, normalized];
+
+      const updated = existing
+        ? prev.map((item) =>
+            item._id === product._id && item.selectedSize === product.selectedSize
+              ? { ...item, quantity: item.quantity + product.quantity }
+              : item
+          )
+        : [...prev, product];
+
+      saveCart(updated);
+      return updated;
     });
   };
 
-  // Remove item completely
-  const removeFromCart = (id, selectedSize = null) => {
-    setCartItems((prev) =>
-      prev.filter(
-        (i) =>
-          !(
-            i.id === id &&
-            (selectedSize == null || i.selectedSize === selectedSize)
-          )
-      )
+  const removeFromCart = (id, size) => {
+    const updated = cartItems.filter(
+      (item) => !(item._id === id && item.selectedSize === size)
     );
+    setCartItems(updated);
+    saveCart(updated);
   };
 
-  // Increase quantity
-  const increaseQuantity = (id, selectedSize = null) => {
-    setCartItems((prev) =>
-      prev.map((i) =>
-        i.id === id && (i.selectedSize ?? null) === selectedSize
-          ? { ...i, quantity: (i.quantity ?? 1) + 1 }
-          : i
-      )
+  const increaseQuantity = (id, size) => {
+    const updated = cartItems.map((item) =>
+      item._id === id && item.selectedSize === size
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
     );
+    setCartItems(updated);
+    saveCart(updated);
   };
 
-  // Decrease quantity (minimum 1)
-  const decreaseQuantity = (id, selectedSize = null) => {
-    setCartItems((prev) =>
-      prev.map((i) =>
-        i.id === id && (i.selectedSize ?? null) === selectedSize
-          ? { ...i, quantity: Math.max((i.quantity ?? 1) - 1, 1) }
-          : i
-      )
+  const decreaseQuantity = (id, size) => {
+    const updated = cartItems.map((item) =>
+      item._id === id && item.selectedSize === size
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
     );
+    setCartItems(updated);
+    saveCart(updated);
   };
 
-  // Clear entire cart
-  const clearCart = () => setCartItems([]);
+  const clearCartAfterOrder = async () => {
+    setCartItems([]);
+    if (!user) {
+      localStorage.removeItem("cart");
+      return;
+    }
+
+    await setDoc(doc(db, "users", user.uid, "cart", "data"), { items: [] });
+  };
 
   return (
     <CartContext.Provider
@@ -90,9 +114,9 @@ export const CartProvider = ({ children }) => {
         cartItems,
         addToCart,
         removeFromCart,
-        clearCart,
         increaseQuantity,
         decreaseQuantity,
+        clearCartAfterOrder,
       }}
     >
       {children}

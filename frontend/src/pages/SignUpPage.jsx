@@ -12,6 +12,8 @@ import {
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { db } from "../firebaseConfig";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export default function SignUpPage() {
   const [name, setName] = useState("");
@@ -19,6 +21,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { signup } = useAuth();
 
@@ -26,10 +29,32 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    if (!name || !email || !password) {
+      setError("All fields are required");
+      setLoading_pkt(false);
+      return;
+    }
+
     try {
-      await signup(email, password);
-      navigate("/");
+      // 1️⃣ Firebase Auth signup
+      const res = await signup(email, password);
+      const user = res.user;
+
+      // 2️⃣ Create Firestore user document
+      await setDoc(doc(db, "users", user.uid), {
+        name: name,
+        email: user.email,
+        role: "user",
+        createdAt: serverTimestamp(),
+      });
+
+      console.log("User created in Firestore:", user.uid);
+
+      alert("Signup successful");
+      navigate("/login");
     } catch (err) {
+      console.error("Signup error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -38,7 +63,7 @@ export default function SignUpPage() {
 
   return (
     <Box
-      maxW="420px" // reduced width to match original screenshot
+      maxW="420px"
       mx="auto"
       mt="100px"
       textAlign="center"

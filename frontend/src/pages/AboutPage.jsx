@@ -11,98 +11,103 @@ import {
   Highlight,
   SimpleGrid,
 } from "@chakra-ui/react";
-import AboutImg from "../assets/frontend_assets/About_img.jpg";
+import AboutImg from "../assets/frontend_assets/aboutus.jpg";
 
 const About = () => {
   return (
-    <Box px={{ base: 6, md: 20 }} py={10} fontFamily="Arial, sans-serif">
-      {/* ======= ABOUT US ======= */}
-      <Stack spacing={1} textAlign="center" mb={10}>
-        <Heading as="h2" size="lg" fontWeight="semibold">
+    <Box px={{ base: 6, md: 24 }} py={{ base: 10, md: 16 }}>
+      {/* ===== ABOUT US HEADER ===== */}
+      <Stack spacing={2} textAlign="center" mb={14}>
+        <Heading fontSize={{ base: "xl", md: "2xl" }} fontWeight="semibold">
           ABOUT{" "}
-          <Highlight query="US" styles={{ color: "black", fontWeight: "bold" }}>
+          <Highlight query="US" styles={{ fontWeight: "bold" }}>
             US
           </Highlight>
         </Heading>
-        <Divider borderColor="black" w="60px" mx="auto" borderWidth="1.5px" />
+        <Divider borderColor="black" w="60px" mx="auto" borderWidth="2px" />
       </Stack>
 
+      {/* ===== IMAGE + CONTENT ===== */}
       <Flex
         direction={{ base: "column", md: "row" }}
-        align="center"
-        gap={10}
+        gap={{ base: 10, md: 14 }}
+        align="stretch"
         mb={20}
       >
         {/* Image */}
-        <Box flex="1" display="flex" justifyContent="center">
+        <Box flex="1">
           <Image
             src={AboutImg}
-            alt="About Us"
-            borderRadius="md"
-            maxW="500px"
+            alt="EasyBazzar lifestyle products"
+            borderRadius="lg"
             w="100%"
+            h={{ base: "auto", md: "100%" }}
+            maxH="520px"
             objectFit="cover"
           />
         </Box>
 
-        {/* Text */}
-        <Box flex="1" color="gray.700" fontSize="md" lineHeight="tall">
+        {/* Content */}
+        <Box
+          flex="1"
+          color="gray.700"
+          fontSize="md"
+          lineHeight="1.9"
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+        >
           <Text mb={5}>
-            Forever started with a simple vision: to make shopping more
-            intuitive, enjoyable, and accessible for everyone. What began as an
-            idea to connect customers with a variety of products has evolved
-            into a trusted platform that offers a carefully chosen selection
-            across multiple categories.
+            <strong>EasyBazzar</strong> was built with a simple goal — to make
+            online shopping easier, smarter, and more reliable for everyone.
+            What started as a small idea has grown into a trusted e-commerce
+            platform offering a wide range of carefully selected products.
           </Text>
 
           <Text mb={5}>
-            Over the years, we’ve built partnerships with reliable brands and
-            suppliers, ensuring that each item in our store meets our standards
-            for quality and value. From fashion and beauty to electronics and
-            home essentials, our collection is designed to meet the needs of
-            every lifestyle.
+            We work closely with verified sellers and brands to ensure every
+            product meets our standards of quality, value, and authenticity.
+            From fashion and beauty to electronics and everyday essentials,
+            EasyBazzar is designed to fit every lifestyle.
           </Text>
 
-          <Heading as="h4" size="md" fontWeight="bold" mb={2}>
+          <Heading as="h4" fontSize="lg" fontWeight="bold" mb={2}>
             Our Mission
           </Heading>
 
           <Text>
-            Our mission is to give customers freedom of choice while making the
-            shopping process effortless and trustworthy. From browsing to
-            delivery, we’re committed to providing a smooth, reliable experience
-            that goes beyond expectations.
+            Our mission is to provide customers with freedom of choice while
+            delivering a smooth, secure, and enjoyable shopping experience.
+            From browsing to doorstep delivery, EasyBazzar is committed to
+            excellence at every step.
           </Text>
         </Box>
       </Flex>
 
-      {/* ======= WHY CHOOSE US ======= */}
-      <Stack spacing={1} mb={8}>
-        <Heading as="h3" size="md" fontWeight="semibold">
+      {/* ===== WHY CHOOSE US ===== */}
+      <Stack spacing={2} mb={10}>
+        <Heading fontSize="lg" fontWeight="semibold">
           WHY{" "}
-          <Highlight
-            query="CHOOSE US"
-            styles={{ color: "black", fontWeight: "bold" }}
-          >
+          <Highlight query="CHOOSE US" styles={{ fontWeight: "bold" }}>
             CHOOSE US
           </Highlight>
         </Heading>
-        <Divider borderColor="black" w="80px" borderWidth="1.5px" />
+        <Divider borderColor="black" w="80px" borderWidth="2px" />
       </Stack>
 
-      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={20}>
+      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
         {[
           {
-            title: "Quality Assurance:",
-            desc: "Every product is handpicked and checked to ensure it meets our strict quality benchmarks.",
+            title: "Quality You Can Trust",
+            desc: "Each product on EasyBazzar is reviewed to ensure quality, durability, and value for money.",
           },
           {
-            title: "Convenience:",
-            desc: "With our easy-to-use interface and streamlined ordering system, shopping is stress-free and simple.",
+            title: "Easy & Secure Shopping",
+            desc: "Our user-friendly platform makes browsing, ordering, and payment smooth and hassle-free.",
           },
           {
-            title: "Exceptional Customer Service:",
-            desc: "Our dedicated team is always ready to help, ensuring your satisfaction at every step of the journey.",
+            title: "Customer-First Support",
+            desc: "We prioritize customer satisfaction with responsive support and reliable service.",
           },
         ].map((item, index) => (
           <Box
@@ -110,15 +115,14 @@ const About = () => {
             p={6}
             border="1px solid"
             borderColor="gray.200"
-            borderRadius="md"
-            transition="all 0.3s ease"
+            borderRadius="lg"
             _hover={{
-              transform: "translateY(-5px)",
               boxShadow: "lg",
-              borderColor: "blackAlpha.300",
+              transform: "translateY(-6px)",
             }}
+            transition="all 0.3s ease"
           >
-            <Text fontWeight="bold" mb={2}>
+            <Text fontWeight="bold" mb={3}>
               {item.title}
             </Text>
             <Text color="gray.600">{item.desc}</Text>

@@ -10,13 +10,14 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { useCart } from "../context/CartContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const { cartItems, removeFromCart, increaseQuantity, decreaseQuantity } =
     useCart();
+  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const shippingFee = 10;
   const subtotal = cartItems.reduce(
@@ -25,7 +26,15 @@ const CartPage = () => {
   );
   const total = subtotal + shippingFee;
 
-  const isPlaceOrderPage = location.pathname === "/placeorder";
+  /* ================= CHECKOUT HANDLER ================= */
+  const handleCheckout = () => {
+    if (!isLoggedIn) {
+      navigate("/login", { state: { from: "/cart" } });
+      return;
+    }
+
+    navigate("/placeorder");
+  };
 
   return (
     <Box px={{ base: 4, md: 12 }} py={8} minH="80vh">
@@ -40,7 +49,7 @@ const CartPage = () => {
       ) : (
         <>
           {/* Cart Items */}
-          <VStack align="stretch" spacing={4} mb={isPlaceOrderPage ? 4 : 20}>
+          <VStack align="stretch" spacing={4} mb={10}>
             {cartItems.map((item) => (
               <Flex
                 key={`${item.id}-${item.selectedSize}`}
@@ -59,7 +68,7 @@ const CartPage = () => {
                     objectFit="cover"
                   />
                   <Box>
-                    <Text>{item.name}</Text>
+                    <Text fontWeight="500">{item.name}</Text>
                     <Text fontSize="sm" color="gray.600">
                       ${item.price}
                     </Text>
@@ -67,12 +76,13 @@ const CartPage = () => {
                 </Flex>
 
                 {/* Size */}
-                <Box w="60px" textAlign="center">
-                  <Text>{item.selectedSize}</Text>
+                <Box w="70px" textAlign="center">
+                  <Text fontSize="sm">Size</Text>
+                  <Text fontWeight="500">{item.selectedSize}</Text>
                 </Box>
 
-                {/* Quantity Controls */}
-                <HStack w="80px" justify="center">
+                {/* Quantity */}
+                <HStack w="100px" justify="center">
                   <Button
                     size="sm"
                     variant="outline"
@@ -96,7 +106,7 @@ const CartPage = () => {
                 </HStack>
 
                 {/* Remove */}
-                <Box w="50px" textAlign="center">
+                <Box w="60px" textAlign="center">
                   <Button
                     size="sm"
                     variant="ghost"
@@ -111,61 +121,42 @@ const CartPage = () => {
             ))}
           </VStack>
 
-          {/* Fixed Cart Totals Box - show only if cart has items & not on placeorder page */}
-          {!isPlaceOrderPage && cartItems.length > 0 && (
-            <Box
-              position="fixed"
-              bottom="0"
-              right="0"
-              bg="white"
-              borderTopWidth="1px"
-              borderLeftWidth="1px"
-              p={4}
-              w={{ base: "100%", md: "300px" }}
-              boxShadow="md"
-              zIndex="1000"
+          {/* Cart Summary */}
+          <Box maxW="400px" ml="auto">
+            <Divider mb={4} />
+
+            <Flex justify="space-between" mb={2}>
+              <Text>Subtotal</Text>
+              <Text>${subtotal.toFixed(2)}</Text>
+            </Flex>
+
+            <Flex justify="space-between" mb={2}>
+              <Text>Shipping Fee</Text>
+              <Text>${shippingFee.toFixed(2)}</Text>
+            </Flex>
+
+            <Divider my={3} />
+
+            <Flex
+              justify="space-between"
+              fontWeight="bold"
+              fontSize="lg"
+              mb={4}
             >
-              <Text fontSize="lg" mb={1} textTransform="uppercase">
-                Cart Totals
-              </Text>
-              <Divider mb={4} borderColor="black" />
+              <Text>Total</Text>
+              <Text>${total.toFixed(2)}</Text>
+            </Flex>
 
-              <Flex justify="space-between" mb={2}>
-                <Text>Subtotal</Text>
-                <Text>${subtotal.toFixed(2)}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text>Shipping Fee</Text>
-                <Text>${shippingFee.toFixed(2)}</Text>
-              </Flex>
-              <Divider my={3} />
-              <Flex
-                justify="space-between"
-                fontWeight="bold"
-                fontSize="lg"
-                mb={4}
-              >
-                <Text>Total</Text>
-                <Text>${total.toFixed(2)}</Text>
-              </Flex>
-
-             
-<Button
-  bg="black"
-  color="white"
-  size="sm"
-  w="full"
-  _hover={{ bg: "gray.800" }}
-  onClick={() => {
-    console.log("[CartPage] proceed to checkout clicked, cartItems:", cartItems);
-    navigate("/placeorder");
-  }}
->
-  Proceed to Checkout
-</Button>
- 
-            </Box>
-          )}
+            <Button
+              bg="black"
+              color="white"
+              w="full"
+              _hover={{ bg: "gray.800" }}
+              onClick={handleCheckout}
+            >
+              {isLoggedIn ? "Proceed to Checkout" : "Login to Checkout"}
+            </Button>
+          </Box>
         </>
       )}
     </Box>
