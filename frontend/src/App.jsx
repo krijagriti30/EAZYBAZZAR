@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-// PAGES
+// ================= PAGES =================
 import Home from "./pages/Home";
 import CollectionPage from "./pages/CollectionPage";
 import AboutPage from "./pages/AboutPage";
@@ -15,10 +15,10 @@ import OrderSuccess from "./pages/OrderSuccess";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 
-// AUTH
+// ================= AUTH =================
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// DASHBOARD
+// ================= DASHBOARD =================
 import Dashboard from "./dashboard/Dashboard";
 import ProfilePage from "./dashboard/Profile";
 import Orders from "./dashboard/Orders";
@@ -30,7 +30,7 @@ import SavedAddresses from "./dashboard/SavedAddresses";
 import PaymentManagement from "./dashboard/PaymentManagement";
 import ProfileDetails from "./dashboard/ProfileDetails";
 
-// CSS
+// ================= CSS =================
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -55,16 +55,12 @@ function App() {
         {/* Cart → allowed without login */}
         <Route path="/cart" element={<CartPage />} />
 
-        {/* Wishlist → page itself checks login (Myntra style) */}
+        {/* Wishlist → page handles auth internally */}
         <Route path="/wishlist" element={<Wishlist />} />
 
-        {/* Checkout → login enforced inside CartPage */}
+        {/* Checkout */}
         <Route path="/placeorder" element={<PlaceOrder />} />
-
-        <Route
-          path="/order-success/:orderId"
-          element={<OrderSuccess />}
-        />
+        <Route path="/ordersuccess" element={<OrderSuccess />} />
 
         {/* ================= AUTH ================= */}
         <Route path="/signup" element={<SignUpPage />} />
@@ -79,18 +75,19 @@ function App() {
             </ProtectedRoute>
           }
         >
+          {/* Default dashboard page */}
           <Route index element={<ProfilePage />} />
           <Route path="profile" element={<ProfilePage />} />
 
-          {/* Optional: dashboard cart view */}
+          {/* 🔥 REUSED PAGES */}
           <Route path="cart" element={<CartPage />} />
+          <Route path="wishlist" element={<Wishlist />} />
 
+          {/* Orders */}
           <Route path="orders" element={<Orders />} />
-          <Route
-            path="orders/:orderId"
-            element={<OrderDetails />}
-          />
+          <Route path="orders/:orderId" element={<OrderDetails />} />
 
+          {/* Others */}
           <Route path="trackorder" element={<Trackorder />} />
           <Route path="help" element={<Help />} />
           <Route path="gift-cards" element={<EGiftCards />} />

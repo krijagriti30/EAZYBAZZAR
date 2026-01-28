@@ -9,33 +9,57 @@ export const CartProvider = ({ children }) => {
   const { user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
 
-  // ================= LOAD CART =================
+  /* ================= LOAD CART ================= */
   useEffect(() => {
-    const loadCart = async () => {
-      if (!user) {
-        const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-        setCartItems(localCart);
-        return;
-      }
+  const loadCart = async () => {
+    const localCart = JSON.parse(localStorage.getItem("cart")) || [];
 
-      try {
-        const cartRef = doc(db, "users", user.uid, "cart", "data"); // ✅ correct path
-        const snap = await getDoc(cartRef);
+    // 👤 NOT LOGGED IN → use local cart only
+    if (!user) {
+      setCartItems(localCart);
+      return;
+    }
 
-        if (snap.exists()) {
-          setCartItems(snap.data().items || []);
+    try {
+      const cartRef = doc(db, "users", user.uid, "cart", "data");
+      const snap = await getDoc(cartRef);
+
+      const firebaseCart = snap.exists() ? snap.data().items || [] : [];
+
+      // 🔀 MERGE LOCAL + FIREBASE
+      const mergedCart = [...firebaseCart];
+
+      localCart.forEach((localItem) => {
+        const existing = mergedCart.find(
+          (item) =>
+            item._id === localItem._id &&
+            item.selectedSize === localItem.selectedSize
+        );
+
+        if (existing) {
+          existing.quantity += localItem.quantity;
         } else {
-          setCartItems([]);
+          mergedCart.push(localItem);
         }
-      } catch (err) {
-        console.error("Load cart failed:", err);
-      }
-    };
+      });
 
-    loadCart();
-  }, [user]);
+      // 💾 SAVE MERGED CART TO FIREBASE
+      await setDoc(cartRef, { items: mergedCart });
 
-  // ================= SAVE CART =================
+      // 🧹 CLEAR LOCAL CART
+      localStorage.removeItem("cart");
+
+      setCartItems(mergedCart);
+    } catch (err) {
+      console.error("Cart merge failed:", err);
+    }
+  };
+
+  loadCart();
+}, [user]);
+
+
+  /* ================= SAVE CART ================= */
   const saveCart = async (items) => {
     if (!user) {
       localStorage.setItem("cart", JSON.stringify(items));
@@ -43,33 +67,42 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      await setDoc(doc(db, "users", user.uid, "cart", "data"), { items }); // ✅ correct path
+      await setDoc(doc(db, "users", user.uid, "cart", "data"), {
+        items,
+      });
     } catch (err) {
       console.error("Save cart failed:", err);
     }
   };
 
-  // ================= CART FUNCTIONS =================
+  /* ================= ADD TO CART ================= */
   const addToCart = (product) => {
     setCartItems((prev) => {
       const existing = prev.find(
         (item) =>
-          item._id === product._id && item.selectedSize === product.selectedSize
+          item._id === product._id &&
+          item.selectedSize === product.selectedSize
       );
 
-      const updated = existing
-        ? prev.map((item) =>
-            item._id === product._id && item.selectedSize === product.selectedSize
-              ? { ...item, quantity: item.quantity + product.quantity }
-              : item
-          )
-        : [...prev, product];
+      let updated;
+
+      if (existing) {
+        updated = prev.map((item) =>
+          item._id === product._id &&
+          item.selectedSize === product.selectedSize
+            ? { ...item, quantity: item.quantity + product.quantity }
+            : item
+        );
+      } else {
+        updated = [...prev, product];
+      }
 
       saveCart(updated);
       return updated;
     });
   };
 
+  /* ================= REMOVE ================= */
   const removeFromCart = (id, size) => {
     const updated = cartItems.filter(
       (item) => !(item._id === id && item.selectedSize === size)
@@ -78,6 +111,7 @@ export const CartProvider = ({ children }) => {
     saveCart(updated);
   };
 
+  /* ================= INCREASE ================= */
   const increaseQuantity = (id, size) => {
     const updated = cartItems.map((item) =>
       item._id === id && item.selectedSize === size
@@ -88,24 +122,32 @@ export const CartProvider = ({ children }) => {
     saveCart(updated);
   };
 
+  /* ================= DECREASE ================= */
   const decreaseQuantity = (id, size) => {
-    const updated = cartItems.map((item) =>
-      item._id === id && item.selectedSize === size
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
-    );
+    const updated = cartItems
+      .map((item) =>
+        item._id === id && item.selectedSize === size
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
+      .filter((item) => item.quantity > 0);
+
     setCartItems(updated);
     saveCart(updated);
   };
 
+  /* ================= CLEAR AFTER ORDER ================= */
   const clearCartAfterOrder = async () => {
     setCartItems([]);
+
     if (!user) {
       localStorage.removeItem("cart");
       return;
     }
 
-    await setDoc(doc(db, "users", user.uid, "cart", "data"), { items: [] });
+    await setDoc(doc(db, "users", user.uid, "cart", "data"), {
+      items: [],
+    });
   };
 
   return (

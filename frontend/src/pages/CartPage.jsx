@@ -14,19 +14,26 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
-  const { cartItems, removeFromCart, increaseQuantity, decreaseQuantity } =
-    useCart();
+  const {
+    cartItems,
+    removeFromCart,
+    increaseQuantity,
+    decreaseQuantity,
+  } = useCart();
+
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
   const shippingFee = 10;
+
   const subtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
+
   const total = subtotal + shippingFee;
 
-  /* ================= CHECKOUT HANDLER ================= */
+  /* ================= CHECKOUT ================= */
   const handleCheckout = () => {
     if (!isLoggedIn) {
       navigate("/login", { state: { from: "/cart" } });
@@ -38,7 +45,6 @@ const CartPage = () => {
 
   return (
     <Box px={{ base: 4, md: 12 }} py={8} minH="80vh">
-      {/* Header */}
       <Text fontSize="lg" mb={1} textTransform="uppercase">
         Your Cart
       </Text>
@@ -48,16 +54,16 @@ const CartPage = () => {
         <Text>Your cart is empty</Text>
       ) : (
         <>
-          {/* Cart Items */}
+          {/* CART ITEMS */}
           <VStack align="stretch" spacing={4} mb={10}>
             {cartItems.map((item) => (
               <Flex
-                key={`${item.id}-${item.selectedSize}`}
+                key={`${item._id}-${item.selectedSize}`}
                 borderBottomWidth="1px"
                 pb={4}
                 align="center"
               >
-                {/* Product Info */}
+                {/* PRODUCT */}
                 <Flex align="center" gap={4} flex="2">
                   <Image
                     src={
@@ -75,43 +81,44 @@ const CartPage = () => {
                   </Box>
                 </Flex>
 
-                {/* Size */}
+                {/* SIZE */}
                 <Box w="70px" textAlign="center">
                   <Text fontSize="sm">Size</Text>
                   <Text fontWeight="500">{item.selectedSize}</Text>
                 </Box>
 
-                {/* Quantity */}
+                {/* QUANTITY */}
                 <HStack w="100px" justify="center">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() =>
-                      decreaseQuantity(item.id, item.selectedSize)
+                      decreaseQuantity(item._id, item.selectedSize)
                     }
-                    isDisabled={item.quantity <= 1}
                   >
                     −
                   </Button>
+
                   <Text>{item.quantity}</Text>
+
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() =>
-                      increaseQuantity(item.id, item.selectedSize)
+                      increaseQuantity(item._id, item.selectedSize)
                     }
                   >
                     +
                   </Button>
                 </HStack>
 
-                {/* Remove */}
+                {/* REMOVE */}
                 <Box w="60px" textAlign="center">
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() =>
-                      removeFromCart(item.id, item.selectedSize)
+                      removeFromCart(item._id, item.selectedSize)
                     }
                   >
                     🗑
@@ -121,7 +128,7 @@ const CartPage = () => {
             ))}
           </VStack>
 
-          {/* Cart Summary */}
+          {/* SUMMARY */}
           <Box maxW="400px" ml="auto">
             <Divider mb={4} />
 

@@ -102,7 +102,10 @@ const ProfilePage = () => {
           textAlign="center"
           cursor="pointer"
           _hover={{ bg: "gray.50" }}
+          onClick={() => navigate("/dashboard/wishlist")}
         >
+
+        
           <Icon as={FiHeart} boxSize={6} mb={2} />
           <Text fontSize="sm">Wishlist</Text>
         </Box>

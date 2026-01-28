@@ -29,7 +29,7 @@ const OrderDetails = () => {
       try {
         const ref = doc(
           db,
-          "orders",
+          "users",
           user.uid,
           "orders",
           orderId
@@ -54,7 +54,7 @@ const OrderDetails = () => {
   if (!order) return <Text p={6}>Order not found</Text>;
 
   return (
-    <Box p={6} bg="gray.50" minH="100vh">
+    <Box p={6} bg="white" minH="100vh">
       {/* HEADER */}
       <HStack justify="space-between" mb={4}>
         <Box>
