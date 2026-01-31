@@ -88,7 +88,7 @@ const Dashboard = () => {
           <NavLink to="cart" style={linkStyle}>🛒 Cart</NavLink>
           <NavLink to="orders" style={linkStyle}>📦 Orders</NavLink>
           <NavLink to="trackorder" style={linkStyle}>🚚 Track Order</NavLink>
-          <NavLink to="wishlist" style={linkStyle}>⚙️ Wishlist</NavLink>
+          <NavLink to="wishlist" style={linkStyle}> ❤️ Wishlist</NavLink>
           <NavLink to="Setting" style={linkStyle}>⚙️ Settings</NavLink>
           
         </VStack>
