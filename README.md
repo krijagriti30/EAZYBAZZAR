@@ -31,6 +31,21 @@ The application features secure authentication, product collections, cart & orde
 - **Backend & Database:** Firebase (Firestore, Auth, Storage)
 - **PDF Generation:** jsPDF
 
+## Photos
+
+### 🏠 Home Page
+![Home Page](images/Homepage.png)
+
+
+### 🛍 Collection Page
+![Collection Page](images/Collectionpage.png)
+
+
+### ✅ User Dashboard Page
+![User Dashboard Page](images/userdashboardpage.png)
+
+
+
 ## Getting Started
 
 **Prerequisites**
@@ -76,6 +91,7 @@ The application will run at:
 ``` bash
 http://localhost:5173
 ```
+
 
 
 
