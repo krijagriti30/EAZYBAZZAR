@@ -1,73 +1,35 @@
-import React, { useEffect, useState } from "react";
+import { Box, Input, Button, VStack } from "@chakra-ui/react";
+import { useAuth } from "../context/AuthContext";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import { useEffect, useState } from "react";
 
-const ProfileDetails = () => {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function ProfileDetails() {
+  const { user } = useAuth();
+  const [form, setForm] = useState({ name: "", phone: "" });
 
   useEffect(() => {
-    // Simulating API call
-    setTimeout(() => {
-      setProfile({
-        name: "John Doe",
-        email: "johndoe@example.com",
-        phone: "+1 234 567 890",
-        address: "New York, USA",
-        avatar: "https://i.pravatar.cc/150",
-      });
-      setLoading(false);
-    }, 1000);
-  }, []);
+    if (!user) return;
+    getDoc(doc(db, "users", user.uid)).then((snap) => {
+      if (snap.exists()) setForm(snap.data());
+    });
+  }, [user]);
 
-  if (loading) {
-    return <p>Loading profile...</p>;
-  }
+  const save = async () => {
+    await setDoc(doc(db, "users", user.uid), {
+      ...form,
+      email: user.email,
+    }, { merge: true });
+    alert("Profile saved!");
+  };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <img
-          src={profile.avatar}
-          alt="Profile"
-          style={styles.avatar}
-        />
-        <h2>{profile.name}</h2>
-        <p><strong>Email:</strong> {profile.email}</p>
-        <p><strong>Phone:</strong> {profile.phone}</p>
-        <p><strong>Address:</strong> {profile.address}</p>
-
-        <button style={styles.button}>Edit Profile</button>
-      </div>
-    </div>
+    <VStack>
+      <Input placeholder="Name" value={form.name}
+        onChange={(e)=>setForm({...form, name:e.target.value})}/>
+      <Input placeholder="Phone" value={form.phone}
+        onChange={(e)=>setForm({...form, phone:e.target.value})}/>
+      <Button onClick={save}>Save</Button>
+    </VStack>
   );
-};
-
-const styles = {
-  container: {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f4f6f8",
-  },
-  card: {
-    backgroundColor: "#fff",
-    padding: "2rem",
-    borderRadius: "10px",
-    width: "320px",
-    textAlign: "center",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-  },
-  avatar: {
-    width: "120px",
-    height: "120px",
-    borderRadius: "50%",
-    marginBottom: "1rem",
-  },
-  button: {
-    marginTop: "1rem",
-    padding: "10px 20px",
-    cursor: "pointer",
-  },
-};
-
-export default ProfileDetails;
+}

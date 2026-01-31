@@ -16,14 +16,13 @@ const OrderSuccess = () => {
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    if (!location.state) {
-      navigate("/");
-    } else {
+    if (location.state) {
       setOrder(location.state);
     }
-  }, [location, navigate]);
+  }, [location]);
 
-  if (!order) {
+  // 🔒 Guard
+  if (!order || !order.deliveryInfo) {
     return (
       <Box maxW="600px" mx="auto" py={10} textAlign="center">
         <Heading fontSize="xl">No Order Found</Heading>
@@ -37,10 +36,10 @@ const OrderSuccess = () => {
 
   const {
     orderId,
-    items,
-    total,
-    paymentMethod,
-    deliveryInfo,
+    items = [],
+    total = 0,
+    paymentMethod = "",
+    deliveryInfo = {},
   } = order;
 
   return (
@@ -59,16 +58,17 @@ const OrderSuccess = () => {
 
       <SimpleGrid columns={2} spacing={3} mb={6}>
         <Text>
-          <b>Name:</b> {deliveryInfo.firstName} {deliveryInfo.lastName}
+          <b>Name:</b> {deliveryInfo?.firstName || ""}{" "}
+          {deliveryInfo?.lastName || ""}
         </Text>
         <Text>
-          <b>Email:</b> {deliveryInfo.email}
+          <b>Email:</b> {deliveryInfo?.email || ""}
         </Text>
         <Text>
-          <b>Phone:</b> {deliveryInfo.phone}
+          <b>Phone:</b> {deliveryInfo?.phone || ""}
         </Text>
         <Text>
-          <b>Address:</b> {deliveryInfo.street}
+          <b>Address:</b> {deliveryInfo?.street || ""}
         </Text>
       </SimpleGrid>
 
@@ -79,8 +79,8 @@ const OrderSuccess = () => {
       </Heading>
 
       <VStack align="stretch" spacing={3} mb={6}>
-        {items.map((item) => (
-          <Box key={item._id} display="flex" justifyContent="space-between">
+        {items.map((item, index) => (
+          <Box key={index} display="flex" justifyContent="space-between">
             <Text>
               {item.title} × {item.quantity}
             </Text>
@@ -92,7 +92,7 @@ const OrderSuccess = () => {
       <Divider mb={4} />
 
       <Text>
-        <b>Payment Method:</b> {paymentMethod.toUpperCase()}
+        <b>Payment Method:</b> {paymentMethod?.toUpperCase()}
       </Text>
       <Text fontSize="lg" fontWeight="bold" mt={2}>
         Total Paid: ₹{total}

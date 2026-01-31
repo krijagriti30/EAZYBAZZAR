@@ -137,21 +137,21 @@ const ProfilePage = () => {
           icon={FiMapPin}
           label="Saved Addresses"
           subLabel="Manage addresses"
-          path="/dashboard/addresses"
+          path="/dashboard/savedaddress"
         />
         <Divider />
 
         <MenuItem
           icon={FiUser}
           label="Profile Details"
-          path="/dashboard/profile-details"
+          path="/dashboard/profiledetails"
         />
         <Divider />
 
         <MenuItem
           icon={FiCreditCard}
           label="Payment Management"
-          path="/dashboard/payments"
+          path="/dashboard/payment"
         />
       </VStack>
     </Box>

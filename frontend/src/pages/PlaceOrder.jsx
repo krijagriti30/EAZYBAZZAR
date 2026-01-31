@@ -104,10 +104,15 @@ const PlaceOrder = () => {
 
       // ✅ GO TO SUCCESS PAGE
       navigate("/ordersuccess", {
-        state: {
-          orderId,
-        },
-      });
+  state: {
+    orderId,
+    items: cartItems,
+    total,
+    paymentMethod: payment,
+    deliveryInfo: formData,
+  },
+});
+
     } catch (error) {
       console.error("Order failed:", error);
       toast({
