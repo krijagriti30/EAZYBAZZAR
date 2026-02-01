@@ -49,7 +49,7 @@ export const OrderProvider = ({ children }) => {
     if (!user) return [];
 
     const q = query(
-      collection(db, "orders", user.uid, "orders"),
+      collection(db, "users", user.uid, "orders"),
       orderBy("createdAt", "desc")
     );
 
