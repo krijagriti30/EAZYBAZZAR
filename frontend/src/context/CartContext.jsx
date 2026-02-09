@@ -3,9 +3,9 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { useAuth } from "./AuthContext";
 
-const CartContext = createContext();
+const CartContext = createContext();     // cartItems is created inside cartProvider , NOT inside navbar   , Anything inside { childern} can acess cartItems
 
-export const CartProvider = ({ children }) => {
+export const CartProvider = ({ children }) => { 
   const { user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
 

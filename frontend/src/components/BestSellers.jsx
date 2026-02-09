@@ -4,10 +4,11 @@ import { products } from "../assets/frontend_assets/assets.js";
 
 const BestSellers = () => {
   // Get latest 10 bestsellers
-  const latestBestSellers = [...products]
+  const latestBestSellers = [...products]    // [...]=> copy array (dont mutate original )
     .filter(product => product.bestseller)
-    .reverse()
-    .slice(0, 10);
+    .reverse()                            // newest first
+    .slice(0, 10);                        // only first 10 products 
+// slice()=> used to extract a portion of an array without modifying the original  
 
   return (
     <Box py={16} px={{ base: 4, md: 12 }} bg="white">
