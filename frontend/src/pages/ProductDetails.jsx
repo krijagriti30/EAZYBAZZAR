@@ -79,7 +79,7 @@ const ProductDetails = () => {
     setTimeout(() => setShowAddedMsg(false), 2000);
   };
 
-  /* ================= WISHLIST ================= */
+  
    /* ================= WISHLIST ================= */
 const handleAddToWishlist = () => {
   if (!isLoggedIn) {

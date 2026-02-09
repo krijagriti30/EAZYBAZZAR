@@ -11,26 +11,29 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { FaUser, FaShoppingBag, FaHeart } from "react-icons/fa";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
+import { Link as RouterLink, useNavigate } from "react-router-dom";   // routing without page reload + programmatic navigation 
+import { useCart } from "../context/CartContext";     //global state       // cartitems 
+import { useAuth } from "../context/AuthContext";      //global state     // useAuth -> login state , user info , logout 
 
 const Navbar = () => {
-  const { cartItems } = useCart();
-  const { isLoggedIn, logout, user } = useAuth();
-  const navigate = useNavigate();
+  const { cartItems } = useCart();          // gives cart data , used to show cart count badge       // get cartItems from the cart context soo i cnn use in this component , useCart is react hook , it comes from cart context , it gives access to global cart data 
+  const { isLoggedIn, logout, user } = useAuth();  // show login or profile menu , logout user
+  const navigate = useNavigate();      // used instaed <link> when navigation happens after logic
 
   const menuItems = [
-    { label: "HOME", href: "/" },
+    { label: "HOME", href: "/" },   //href -> hypertext refrence 
     { label: "COLLECTION", href: "/collection" },
     { label: "ABOUT", href: "/about" },
     { label: "CONTACT", href: "/contact" },
   ];
 
+   //logs out user , redirects to home page , async safe 
+
   const handleLogout = async () => {
     await logout();
     navigate("/");
   };
+// navbar container 
 
   return (
     <Flex
@@ -39,9 +42,9 @@ const Navbar = () => {
       px={{ base: 6, md: 12 }}
       py={4}
       bg="rgba(255,255,255,0.9)"
-      backdropFilter="blur(8px)"
+      backdropFilter="blur(8px)"  // glassmorphism
       boxShadow="md"
-      position="sticky"
+      position="sticky"       // means navbar stays on top 
       top="0"
       zIndex="1000"
     >
@@ -53,19 +56,20 @@ const Navbar = () => {
         </Box>
       </Box>
 
-      {/* NAV LINKS */}
+      {/* NAV LINKS */} 
+            
       <Flex gap={8}>
         {menuItems.map((item) => (
           <ChakraLink
-            key={item.label}
-            as={RouterLink}
+            key={item.label}      // SPA navigation no reload  
+            as={RouterLink} 
             to={item.href}
             fontSize="sm"
             fontWeight="semibold"
             textTransform="uppercase"
             color="gray.700"
             position="relative"
-            _after={{
+            _after={{   
               content: '""',
               position: "absolute",
               width: "0%",
@@ -101,6 +105,7 @@ const Navbar = () => {
             </Box>
           </MenuButton>
 
+        
           <MenuList minW="240px" p={4} borderRadius="xl" boxShadow="xl">
             {!isLoggedIn ? (
               <>
@@ -126,12 +131,13 @@ const Navbar = () => {
                   Wishlist
                 </MenuItem>
               </>
-            ) : (
+            ) : ( // if logged in -> shows user info ,   here user?.email  means if user exists , give me user.email, otherwisee return undefined (dont crash)
+
               <>
                 <Text fontWeight="bold" mb={2}>
-                  Hello {user?.email || "User"} 👋
+                  Hello {user?.email || "User"} 👋    
                 </Text>
-
+               
                 <MenuItem onClick={() => navigate("/dashboard/profile")}>
                   My Profile
                 </MenuItem>
@@ -165,7 +171,9 @@ const Navbar = () => {
           </Box>
         </ChakraLink>
 
-        {/* CART ICON */}
+        
+
+        {/* CART ICON  */} {/*chakralink is a chakra ui link component its like <a> cart </a>       and render this chakralink as react router <link> instead of normal <a> tag  */}
         <ChakraLink as={RouterLink} to="/cart" position="relative">
           <Box
             p={2}
@@ -175,7 +183,8 @@ const Navbar = () => {
           >
             <FaShoppingBag size={18} />
           </Box>
-
+ 
+ {/*  show badge only if cart has items  cartItems?.length > 0*/}
           {cartItems?.length > 0 && (
             <Badge
               position="absolute"
@@ -187,7 +196,7 @@ const Navbar = () => {
               fontSize="0.7rem"
               px={2}
             >
-              {cartItems.length}
+              {cartItems.length}  {/*  display number of cart items*/}
             </Badge>
           )}
         </ChakraLink>

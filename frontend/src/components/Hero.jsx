@@ -11,16 +11,16 @@ import img5 from "../assets/frontend_assets/home_img5.avif";
 const images = [img1, img2, img3, img4, img5];
 
 const Hero = () => {
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 400,
-    autoplay: true,
-    autoplaySpeed: 2000,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: false,
-    fade: true,
+  const settings = {      
+    dots: false,           //  no navigation dot
+    infinite: true,        //  tansition speed 
+    speed: 400,            //  tansition speed 
+    autoplay: true,        //  auto slide 
+    autoplaySpeed: 2000,   //  every 2 s
+    slidesToShow: 1,       //  1 image at a time 
+    slidesToScroll: 1,     //
+    arrows: false,         //  no arrows
+    fade: true,            //smooth fade instead of slide 
   };
 
   return (
@@ -28,7 +28,7 @@ const Hero = () => {
       {/* Background Slider */}
       <Box position="absolute" top="0" left="0" w="100%" h="100%" zIndex="0">
         <Slider {...settings}>
-          {images.map((src, index) => (
+          {images.map((src, index) => (    //loop through images         // each image become full screen 
             <Box
               key={index}
               bgImage={`url(${src})`}
@@ -42,7 +42,7 @@ const Hero = () => {
         </Slider>
       </Box>
 
-      {/* Overlay */}
+      {/* Dark Overlay */}   
       <Box
         position="absolute"
         top="0"
@@ -71,7 +71,7 @@ const Hero = () => {
             lineHeight="short"
             mb={4}
           >
-            Discover the{" "}
+            Discover the
             <Text as="span" color="pink.400">
               Latest Arrivals
             </Text>
@@ -87,7 +87,7 @@ const Hero = () => {
             won’t find anywhere else.
           </Text>
 
-          <Button
+          <Button             // call to action button
             size="lg"
             colorScheme="pink"
             px={10}

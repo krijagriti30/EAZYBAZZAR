@@ -15,9 +15,11 @@ import { OrderProvider } from "./context/OrderContext";
 // Firebase init
 import "./firebaseConfig.js";
 
+// react attaches app to <div id ="root"></div>
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter>       
       <ChakraProvider>
         <AuthProvider>
           <ShopProvider>
@@ -35,3 +37,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+
+// <browserRouter> -> enables client side routing  like <link /> , useNvigate(), <Route />
+// <ChakraProvider> -> Makes Chakra UI: theme , styles , components , available globally
+
+
+
+
